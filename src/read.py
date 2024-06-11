@@ -10,6 +10,25 @@ def ex_menu_image(args):
     ex_img = pygame.transform.scale(ex_img, (650, 400))
     return ex_img
 
+
+def print_progress_bar(iteration, total, bar_length=50):
+    """
+    Print a progress bar.
+
+    Parameters:
+        iteration (int): Current iteration.
+        total (int): Total number of iterations.
+        bar_length (int): Length of the progress bar.
+
+    """
+    progress = iteration / total
+    arrow = '>' * int(round(progress * bar_length) - 1)
+    spaces = ' ' * (bar_length - len(arrow))
+
+    print(f'\rProgress: [{arrow + spaces}] {progress:.2%}', end='', flush=True)
+
+
+
 #Function to read in the training and task images into the program
 def load_images(args, key):
     if key == "train":
@@ -19,10 +38,15 @@ def load_images(args, key):
     
     img_list = []
     images = sorted(glob.glob(image_path)) #put the images file names at this path into a list sorted alphabetically
+    image_count = len(images)
+    i = 1
     for filename in images:
+        print_progress_bar(i, image_count)
+        i = i + 1
         img = pygame.image.load(filename) #returns a surface object that has the image drawn onto it. This is separate from the display surface object so later we have to blit it (copy contents of one surface onto another)
         img_list.append(pygame.transform.scale(img, (args.img_xscale, args.img_yscale))) #scale the image size and append the surface object to the img_list[] list
-    
+    print()
+
     return img_list
 
 #Function to read in the answer keys
@@ -49,9 +73,9 @@ def load_ans_files(args):
 # the placement of the score, object category labels, and menu objects are not included here, but can be changed in display.py
 def input_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--width', nargs='?', type=int, default=1368,
+    parser.add_argument('--width', nargs='?', type=int, default=1360,
                         help="Width of the spot report screen")
-    parser.add_argument('--height', nargs='?',type=int, default=790,
+    parser.add_argument('--height', nargs='?',type=int, default=768,
                         help="Height of the spot report screen")
     parser.add_argument('--example_objects', nargs='?',type=str, default='resource/examples.png',
                         help="File for the example objects shown on the menu")
