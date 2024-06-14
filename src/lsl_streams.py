@@ -1,22 +1,26 @@
 # LSL inlet and outlet streams
-from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_byprop, cf_float32, cf_int32, IRREGULAR_RATE
+from pylsl import StreamInfo, StreamOutlet, StreamInlet, resolve_byprop,resolve_stream, cf_float32, cf_int32, IRREGULAR_RATE
 import pygame
 from pygame.locals import *
 
-
+def setupInletStream():
 ### LSL Inlet setting
 # Configure LSL Inlet stream 
 # If you want to use a custom inlet stream to manage the lockout function for the spot report, please ensure that you stream your inlet stream first
 # Additionally, in the lsl_outlet folder, you will find a sample code that you can use. If you do not want to use LSL, you can simply run spotreport.py.
-try:
-    spt_trigger_streams = resolve_byprop('name', "spt_task_trigger", 1, timeout=1) 
-    if len(spt_trigger_streams) > 0:
-        inlet_spt_trigger = StreamInlet(spt_trigger_streams[0])
-        inlet_condition = True # data is present and should be read
-    else:
-        inlet_condition = False # no data is present
-except:
-    inlet_condition = False
+        global inlet_condition, inlet_spt_trigger
+        try:
+                print("Awaiting UE Stream Broadcast")
+                spt_trigger_streams = resolve_byprop('type', 'UE_LSL',1,60)
+                print("Connected to UE Stream")
+                if len(spt_trigger_streams) > 0:
+                        inlet_spt_trigger = StreamInlet(spt_trigger_streams[0])
+                        inlet_condition = True # data is present and should be read
+                else:
+                        inlet_condition = False # no data is present
+        except:
+                print("Stream connection timeout")
+                inlet_condition = False
 
 
 ### LSL Outlet setting
@@ -145,18 +149,27 @@ def lsl_outlet_total_score(image_ID, image_score, total_score): # publish data w
 
 
 def read_lsl_inlet(): # process LSL inlet data
+    setupInletStream()
     while True and inlet_condition:
         # Read a sample from the inlet
         sample, _ = inlet_spt_trigger.pull_sample()
+        
+        msg = sample[0].split(',')
+        print(msg)
         #print(sample, sample[0], type(sample[0]))
         # Process the sample data
         # Replace the following lines with your own data processing code if you want functionality besides lockout
-        if int(sample[0]) == 0: # Unlock
-            key_event = pygame.event.Event(KEYDOWN, key=K_u) # convert event into event datatype of pygame
-            pygame.event.post(key_event) # add event to the end of the events on the queue     
-            print("Data sample received: 0 to unlock")
+        if msg[0] == 'LOCKOUT':
+                if int(msg[3]) == 0: # Unlock
+                        key_event = pygame.event.Event(KEYDOWN, key=K_u) # convert event into event datatype of pygame
+                        pygame.event.post(key_event) # add event to the end of the events on the queue     
+                        print("Data sample received: 0 to unlock")
 
-        elif int(sample[0]) == 1: # Lock
-            key_event = pygame.event.Event(KEYDOWN, key=K_l) # convert event into event datatype of pygame
-            pygame.event.post(key_event) # add event to the end of the events on the queue
-            print("Data sample received: 1 to lock")
+                elif int(msg[3]) == 1: # Lock
+                        key_event = pygame.event.Event(KEYDOWN, key=K_l) # convert event into event datatype of pygame
+                        pygame.event.post(key_event) # add event to the end of the events on the queue
+                        print("Data sample received: 1 to lock")
+
+
+if __name__ == '__main__':
+    read_lsl_inlet()
