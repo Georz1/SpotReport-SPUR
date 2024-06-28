@@ -11,7 +11,7 @@ def setupInletStream():
         global inlet_condition, inlet_spt_trigger
         try:
                 print("Awaiting UE Stream Broadcast")
-                spt_trigger_streams = resolve_byprop('type', 'UE_LSL',1,60)
+                spt_trigger_streams = resolve_byprop('type', 'UE_LSL',1)
                 print("Connected to UE Stream")
                 if len(spt_trigger_streams) > 0:
                         inlet_spt_trigger = StreamInlet(spt_trigger_streams[0])
