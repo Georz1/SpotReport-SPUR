@@ -30,21 +30,25 @@ def print_progress_bar(iteration, total, bar_length=50):
 
 
 #Function to read in the training and task images into the program
-def load_images(args, key):
+def load_images(args, key, noOfImages = 514):
     if key == "train":
         image_path = args.train_images_path
+        image_count = len(sorted(glob.glob(image_path)))
     elif key == "task":
         image_path = args.task_images_path
+        image_count = noOfImages
     
     img_list = []
     images = sorted(glob.glob(image_path)) #put the images file names at this path into a list sorted alphabetically
-    image_count = len(images)
+    
     i = 1
     for filename in images:
         print_progress_bar(i, image_count)
         i = i + 1
         img = pygame.image.load(filename) #returns a surface object that has the image drawn onto it. This is separate from the display surface object so later we have to blit it (copy contents of one surface onto another)
         img_list.append(pygame.transform.scale(img, (args.img_xscale, args.img_yscale))) #scale the image size and append the surface object to the img_list[] list
+        if i > noOfImages:
+            break
     print()
 
     return img_list
