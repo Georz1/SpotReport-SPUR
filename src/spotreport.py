@@ -336,7 +336,7 @@ if __name__ == "__main__":
     training_imgs = load_images(args, key="train")
 
     # read in the task images
-    task_imgs = load_images(args, key="task")
+    task_imgs = load_images(args, key="task",noOfImages=25)
 
     # read in the example objects for the menu
     ex_img = ex_menu_image(args)
