@@ -27,7 +27,7 @@ class Score:
     def calculate_score(args, img_ID, val_received , mode, current_score, ans_dict, file_extention):
         #the points for each object type
         #PEOPLE_POINTS, VEHICLES_POINTS, BAGS_POINTS, BARRELS_POINTS, ANTENNAS_POINTS
-        POINTS = [2, 1, 1, 1, 1]
+        POINTS = [1, 1, 1, 1, 1]
         BONUS_POINTS = 1
         
         current_dict = ans_dict
